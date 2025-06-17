@@ -9,22 +9,27 @@ resources:
   - resources.yaml
 results:
   - kind: CiliumNetworkPolicy
-    policy: cilium-ensure-servername-for-fqdns
+    policy: enforce-sni-for-port-443
     resources:
       - bad-no-sni-check
       - bad-partial-sni-check
-      - bad-wrong-sni-check
       - bad-no-servernames
       - bad-no-sni-check-443
     result: fail
-    rule: validate-servername-for-fqdns
+    rule: validate-servernames-for-port-443
   - kind: CiliumNetworkPolicy
-    policy: cilium-ensure-servername-for-fqdns
+    policy: enforce-sni-for-port-443
     resources:
       - good-with-sni-check
       - good-with-sni-check-simple
       - good-with-sni-check-list
-      - good-with-no-sni-need-check
       - good-with-sni-check-443
+      - good-super-simple-2
     result: pass
-    rule: validate-servername-for-fqdns
+    rule: validate-servernames-for-port-443
+  - kind: CiliumNetworkPolicy
+    policy: enforce-sni-for-port-443
+    resources:
+      - good-with-no-sni-need-check
+    result: skip
+    rule: validate-servernames-for-port-443
