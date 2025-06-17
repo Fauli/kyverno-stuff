@@ -1,0 +1,40 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: enforce-sni-for-port-443
+  annotations:
+    policies.kyverno.io/title: "Enforce SNI for port 443"
+    policies.kyverno.io/category: "Networking"
+    policies.kyverno.io/severity: "medium"
+    policies.kyverno.io/description: >-
+      This policy ensures that each `toPorts` entry specifying port `443` in a `CiliumNetworkPolicy`
+      resource must include a non-empty `serverNames` field. This requirement enforces best practices
+      for explicit TLS connections with Server Name Indication (SNI).
+spec:
+  validationFailureAction: Enforce
+  rules:
+    - name: validate-servernames-for-port-443
+      match:
+        resources:
+          kinds:
+            - cilium.io/v2/CiliumNetworkPolicy
+      validate:
+        message: >-
+          Each 'toPorts' entry specifying port '443' must have a non-empty 'serverNames' list defined.
+          Ensure this field is explicitly specified to enforce TLS connection standards.
+        foreach:
+          - list: "request.object.spec.egress[].toPorts[]"
+            preconditions:
+              all:
+                - key: "{{ element.ports[].port }}"
+                  operator: AnyIn
+                  value: ["443"]
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.serverNames || `[]` }}"
+                    operator: Equals
+                    value: null
+                  - key: "{{ length(element.serverNames || `[]`) }}"
+                    operator: Equals
+                    value: 0

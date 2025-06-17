@@ -15,6 +15,7 @@ results:
       - bad-partial-sni-check
       - bad-no-servernames
       - bad-no-sni-check-443
+      - bad-no-sni-check-443-v2
     result: fail
     rule: validate-servernames-for-port-443
   - kind: CiliumNetworkPolicy
@@ -25,11 +26,14 @@ results:
       - good-with-sni-check-list
       - good-with-sni-check-443
       - good-super-simple-2
+      - good-super-simple-3
+      - good-super-simple-4
     result: pass
     rule: validate-servernames-for-port-443
   - kind: CiliumNetworkPolicy
     policy: enforce-sni-for-port-443
     resources:
+      - good-with-no-sni-need-check-v2
       - good-with-no-sni-need-check
     result: skip
     rule: validate-servernames-for-port-443
