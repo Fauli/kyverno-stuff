@@ -1,0 +1,332 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-sni-check
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+  - toFQDNs:
+    - matchName: enterprisedirectory.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "636"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: vault-azure.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - vault-azure.prod.abc123.ch
+  - toFQDNs:
+    - matchName: kafka.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "9092"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: schemaregistry.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - schemaregistry.esp-aks-shared.eng.abc123.ch
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        k8s:io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bad-no-sni-check
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+  - toFQDNs:
+    - matchName: enterprisedirectory.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "636"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: vault-azure.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: kafka.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "9092"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: schemaregistry.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        k8s:io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bad-partial-sni-check
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+  - toFQDNs:
+    - matchName: enterprisedirectory.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "636"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: vault-azure.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: kafka.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "9092"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: schemaregistry.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - schemaregistry.esp-aks-shared.eng.abc123.ch
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        k8s:io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bad-wrong-sni-check
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+  - toFQDNs:
+    - matchName: enterprisedirectory.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "636"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: vault-azure.prod.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - vault-azure.prod.abc123.ch
+  - toFQDNs:
+    - matchName: kafka.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "9092"
+        protocol: TCP
+  - toFQDNs:
+    - matchName: schemaregistry.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - other-schemaregistry.esp-aks-shared.eng.abc123.ch
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        k8s:io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bad-no-servernames
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: example.com
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-sni-check-simple
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: gugus.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - gugus.esp-aks-shared.eng.abc123.ch
+  endpointSelector: {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-sni-check-list
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: gugus.esp-aks-shared.eng.abc123.ch
+    - matchName: huhu.esp-aks-shared.eng.abc123.ch
+    - matchName: wow.something.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - gugus.esp-aks-shared.eng.abc123.ch
+      - huhu.esp-aks-shared.eng.abc123.ch
+      - wow.something.eng.abc123.ch
+  endpointSelector: {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-no-sni-need-check
+spec:
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+        k8s:io.kubernetes.pod.namespace: kube-system
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: ANY
+      rules:
+        dns:
+        - matchPattern: '*'
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-no-sni-need-check
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: kafka.esp-aks-shared.eng.abc123.ch
+    toPorts:
+    - ports:
+      - port: "9092"
+        protocol: TCP
+  endpointSelector: {}
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        k8s:io.kubernetes.pod.namespace: containerplattf-tapp-ut2
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: good-with-sni-check-443
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: example.com
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+      serverNames:
+      - example.com
+  endpointSelector: {}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: bad-no-sni-check-443
+spec:
+  egress:
+  - toFQDNs:
+    - matchName: example.com
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
+  endpointSelector: {}

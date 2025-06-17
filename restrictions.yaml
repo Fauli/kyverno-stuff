@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: cilium-ensure-servername-for-fqdns
+spec:
+  validationFailureAction: enforce
+  background: false
+  rules:
+    - name: validate-servername-for-fqdns
+      match:
+        resources:
+          kinds:
+            - cilium.io/v2/CiliumNetworkPolicy
+      validate:
+        message: "Each toPorts block with FQDNs matchName config and port 443 must include a non-empty serverNames list."
+        pattern:
+          spec:
+            egress:
+              - (toPorts):
+                  - (ports):
+                      - (port): "443"
+                    serverNames: "?*"
